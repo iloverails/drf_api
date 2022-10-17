@@ -1,5 +1,6 @@
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import update_last_login
+from rest_framework_simplejwt.exceptions import TokenError
 
 from .models import User
 from rest_framework import serializers
@@ -11,6 +12,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = (
+            'username',
             'email',
             'password'
         )
@@ -20,9 +22,9 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         return auth_user
 
 
-class UserLoginSerializer(serializers.ModelSerializer):
-    email = serializers.EmailField()
-    username = serializers.CharField()
+class UserLoginSerializer(serializers.Serializer):
+    email = serializers.EmailField(allow_blank=True)
+    username = serializers.CharField(allow_blank=True)
     password = serializers.CharField(max_length=128, write_only=True)
     access = serializers.CharField(read_only=True)
     refresh = serializers.CharField(read_only=True)
@@ -39,8 +41,8 @@ class UserLoginSerializer(serializers.ModelSerializer):
         username = data['username']
         password = data['password']
 
-        if username:
-            user = authenticate(email=email, password=password)
+        if email:
+            user = authenticate(username=email, password=password)
         else:
             user = authenticate(username=username, password=password)
 
@@ -59,8 +61,32 @@ class UserLoginSerializer(serializers.ModelSerializer):
                 'refresh': refresh_token,
                 'email': user.email,
                 'role': user.role,
+                'username': user.username
             }
-
             return validation
         except User.DoesNotExist:
             raise serializers.ValidationError("Invalid login credentials")
+
+
+class RefreshTokenSerializer(serializers.Serializer):
+    refresh = serializers.CharField(read_only=True)
+
+    default_error_messages = {
+        'bad_token': 'Token is invalid or expired'
+    }
+
+    def create(self, validated_date):
+        pass
+
+    def update(self, instance, validated_data):
+        pass
+
+    def validate(self, attrs):
+        self.refresh = attrs['refresh']
+        return attrs
+
+    def save(self, **kwargs):
+        try:
+            RefreshToken(self.refresh).blacklist()
+        except TokenError:
+            self.fail('bad_token')
