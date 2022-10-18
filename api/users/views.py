@@ -15,6 +15,7 @@ from .serializers import (
 
 from django.contrib.auth import logout
 from .models import User
+from .permissions import IsAdmin
 
 
 class UserRegistrationView(views.APIView):
@@ -62,7 +63,7 @@ class UserLoginView(views.APIView):
 
 
 class HelloView(views.APIView):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, IsAdmin, )
 
     @staticmethod
     def get(request):
