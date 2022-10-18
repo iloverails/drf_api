@@ -16,10 +16,14 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path
 from django.contrib import admin
+from rest_framework_swagger.views import get_swagger_view
+
+schema_view = get_swagger_view(title='Booking API')
 
 # Wire up our API using automatic URL routing.
 # Additionally, we include login URLs for the browsable API.
 urlpatterns = [
+    path('swagger/', schema_view),
     path('admin/', admin.site.urls),
     # path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('users/', include('api.users.urls')),

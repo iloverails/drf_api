@@ -1,21 +1,25 @@
 from rest_framework import (
     views,
-    viewsets,
     status,
-    response
+    response,
+    generics
 )
-from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
 from .serializers import (
     UserRegistrationSerializer,
     UserLoginSerializer,
-    RefreshTokenSerializer
+    UserSerializer
 )
 
 from django.contrib.auth import logout
+from api.permissions import (
+    IsAdmin,
+    IsTenant,
+    IsLandlord,
+    IsReviewer
+)
 from .models import User
-from .permissions import IsAdmin
 
 
 class UserRegistrationView(views.APIView):
@@ -80,3 +84,9 @@ class UserLogoutView(views.APIView):
         # token = RefreshToken(request.data['refresh'])
         # token.blacklist()
         return response.Response(status=status.HTTP_200_OK)
+
+
+class UsersListView(generics.ListAPIView):
+    permission_classes = (IsAuthenticated, IsAdmin)
+    serializer_class = UserSerializer
+    queryset = User.objects.all()

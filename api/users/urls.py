@@ -7,7 +7,8 @@ from .views import (
     UserRegistrationView,
     UserLoginView,
     UserLogoutView,
-    HelloView
+    HelloView,
+    UsersListView
 )
 
 router = routers.DefaultRouter()
@@ -22,4 +23,5 @@ urlpatterns = [
     path('login', UserLoginView.as_view(), name='login'),
     path('logout', UserLogoutView.as_view(), name='user_logout'),
     path('hello', HelloView.as_view(), name='hello'),
+    path('list', UsersListView.as_view(), name='users_list'),
 ]

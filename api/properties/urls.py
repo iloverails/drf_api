@@ -1,13 +1,8 @@
 from django.contrib import admin
 from django.urls import include, path
-from rest_framework import routers
 from api.properties.views import PropertyViewSet
+from rest_framework.routers import DefaultRouter
 
-router = routers.DefaultRouter()
-router.register(r'properties', PropertyViewSet)
-
-# Wire up our API using automatic URL routing.
-# Additionally, we include login URLs for the browsable API.
-urlpatterns = [
-    path('', include(router.urls)),
-]
+router = DefaultRouter()
+router.register(r'', PropertyViewSet, basename='property')
+urlpatterns = router.urls
