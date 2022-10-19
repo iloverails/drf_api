@@ -39,8 +39,11 @@ class UserLoginSerializer(serializers.Serializer):
     @staticmethod
     def auth(username, email, password, **kwargs):
         try:
+            if username:
+                user = User.objects.get(Q(username=username))
+            else:
+                user = User.objects.get(Q(email=email))
 
-            user = User.objects.get(Q(username=username) | Q(email=email))
             if user:
                 user.set_password(password)
             return user
