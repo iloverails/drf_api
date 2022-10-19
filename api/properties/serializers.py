@@ -1,6 +1,6 @@
 from django.utils import timezone
 
-from .models import Property
+from .models import Property, PropertyImage
 from rest_framework import serializers
 from ..users.models import User
 
@@ -32,4 +32,15 @@ class PropertySerializer(serializers.ModelSerializer):
             'rating',
             'price',
             'landlord'
+        ]
+
+
+class PropertyImageSerializer(serializers.ModelSerializer):
+    property = PropertySerializer()
+
+    class Meta:
+        model = PropertyImage
+        fields = [
+            'property',
+            'image'
         ]
