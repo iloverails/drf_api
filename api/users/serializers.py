@@ -1,7 +1,7 @@
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import update_last_login
 from rest_framework_simplejwt.exceptions import TokenError
-
+from django.db.models import Q
 from .models import User
 from rest_framework import serializers
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -36,15 +36,24 @@ class UserLoginSerializer(serializers.Serializer):
     def update(self, instance, validated_data):
         pass
 
+    @staticmethod
+    def auth(username, email, password, **kwargs):
+        try:
+
+            user = User.objects.get(Q(username=username) | Q(email=email))
+            if user:
+                user.set_password(password)
+            return user
+        except User.DoesNotExist:
+            return None
+
     def validate(self, data):
         email = data['email']
         username = data['username']
         password = data['password']
 
-        if email:
-            user = authenticate(username=email, password=password)
-        else:
-            user = authenticate(username=username, password=password)
+        user = self.auth(username=username, email=email, password=password)
+        print(user)
 
         if user is None:
             raise serializers.ValidationError("Invalid login credentials")
