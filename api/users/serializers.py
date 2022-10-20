@@ -50,10 +50,10 @@ class UserLoginSerializer(serializers.Serializer):
         except User.DoesNotExist:
             return None
 
-    def validate(self, data):
-        email = data['email']
-        username = data['username']
-        password = data['password']
+    def run_validation(self, data):
+        email = data.get('email')
+        username = data.get('username')
+        password = data.get('password')
 
         user = self.auth(username=username, email=email, password=password)
         print(user)
